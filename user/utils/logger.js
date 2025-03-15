@@ -8,7 +8,7 @@ const logger = winston.createLogger({
     winston.format.splat(),  // Enables %s %d-style interpolation
     winston.format.json()
   ),
-  defaultMeta: { service: "identity-service" },
+  defaultMeta: { service: "user-service" },
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(

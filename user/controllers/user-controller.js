@@ -2,16 +2,16 @@ const RefreshToken = require("../models/refresh-token");
 const User = require("../models/Users");
 const generateTokens = require("../utils/token-generator");
 const logger = require("../utils/logger");
-const { validateRegistration } = require("../utils/validation");
+const { validateRegsiterationData } = require("../utils/validation");
 
 
 const registerUser = async (req, res) => {
-  logger.success("Registration Controller function started");
+  logger.info("Registration Controller function started");
   try {
 
 
     //validate the schema
-    const { error } = validateRegistration(req.body);
+    const { error } = validateRegsiterationData(req.body);
     if (error) {
       logger.warn("Validation error", error.details[0].message);
       return res.status(400).json({
@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
 
     user = new User({ username, email, password });
     await user.save();
-    logger.success("User saved successfully", user._id);
+    logger.info("User saved successfully", user._id);
 
     const { accessToken, refreshToken } = await generateTokens(user);
 
