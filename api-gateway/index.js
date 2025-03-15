@@ -10,6 +10,7 @@ dotenv.config();
 const errorHandler = require("./middleware/error-handler");
 const logger = require("./utils/logger");
 const proxy = require("express-http-proxy");
+const { validateToken } = require("./middleware/validate-token");
 
 
 const app = express();
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 app.use('/user',proxy(process.env.USER_SERVICE_URL));
+app.use('/post/',validateToken,proxy(process.env.POST_SERVICE_URL));
 
 app.listen(PORT, () => {
     logger.info(`API Gateway is running on port ${PORT}`);

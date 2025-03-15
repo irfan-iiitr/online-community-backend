@@ -17,10 +17,10 @@ app.use(express.json());
 
 const routes = require("./routes/index");
 const connectToMongoDB = require("./db");
-const errorHandler = require("./middlewares/error-handler");
+const errorHandler = require("./middleware/error-handler");
 
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 connectToMongoDB();
 
@@ -31,12 +31,12 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/api/auth", routes);
+app.use("/api/", routes);
 
 //error handler
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  logger.info(`User service running on port ${PORT}`);
+  logger.info(`post service running on port ${PORT}`);
 });
 
