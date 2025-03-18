@@ -1,0 +1,88 @@
+version: '3.8'  # Defines the Docker Compose version
+
+services:
+  api-gateway:
+    build: ./api-gateway  # Builds the API Gateway from the specified directory
+    ports:
+      - "3000:3000"  # Maps port 3000 on the container to port 3000 on the host
+    env_file: ./api-gateway/.env  # Loads environment variables from a file
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      post-service:
+        condition: service_started
+      content-service:
+        condition: service_started
+      search-service:
+        condition: service_started
+    environment:
+      - RABBIT_URL=amqp://rabbitmq:5672  # Connection URL for RabbitMQ
+
+  user-service:
+    build: ./user  # Builds the User Service
+    env_file: ./user/.env  # Loads environment variables
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_URL=amqp://rabbitmq:5672  # RabbitMQ connection
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  content-service:
+    build: ./content  # Builds the Content Service
+    env_file: ./content/.env  # Loads environment variables
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_URL=amqp://rabbitmq:5672  # RabbitMQ connection
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  post-service:
+    build: ./post  # Builds the Post Service
+    env_file: ./post/.env  # Loads environment variables
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_URL=amqp://rabbitmq:5672  # RabbitMQ connection
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  search-service:
+    build: ./search  # Builds the Search Service
+    env_file: ./search/.env  # Loads environment variables
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_URL=amqp://rabbitmq:5672  # RabbitMQ connection
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management  # Uses the RabbitMQ image with a web management UI
+    ports:
+      - "5672:5672"  # RabbitMQ messaging port
+      - "15672:15672"  # Web management UI port
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]  # Checks if RabbitMQ is running
+      interval: 30s  # Runs the health check every 30 seconds
+      timeout: 10s  # Waits 10 seconds for a response before failing
+      retries: 5

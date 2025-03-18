@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const Redis = require("ioredis");
@@ -12,6 +11,13 @@ const logger = require("./utils/logger");
 const proxy = require("express-http-proxy");
 const { validateToken } = require("./middleware/validate-token");
 
+const requiredEnvVars = ['USER_SERVICE_URL', 'POST_SERVICE_URL', 'CONTENT_SERVICE_URL', 'SEARCH_SERVICE_URL'];
+requiredEnvVars.forEach((envVar) => {
+    if (!process.env[envVar]) {
+        logger.error(`Environment variable ${envVar} is not set.`);
+        process.exit(1);
+    }
+});
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,6 +60,10 @@ app.use('/search/',validateToken,proxy(process.env.SEARCH_SERVICE_URL));
 
 app.listen(PORT, () => {
     logger.info(`API Gateway is running on port ${PORT}`);
+    logger.info(`User Service URL: ${process.env.USER_SERVICE_URL}`);
+    logger.info(`Post Service URL: ${process.env.POST_SERVICE_URL}`);
+    logger.info(`Content Service URL: ${process.env.CONTENT_SERVICE_URL}`);
+    logger.info(`Search Service URL: ${process.env.SEARCH_SERVICE_URL}`);
 });
 
 
