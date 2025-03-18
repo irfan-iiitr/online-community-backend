@@ -1,6 +1,7 @@
 const Post = require("../models/Post");
 const { validateCreatePost } = require("../utils/validation");
-const logger= require('../utils/logger')
+const logger= require('../utils/logger');
+const { publishToQueue } = require("../utils/rabbit");
 
 
 const createPost = async (req, res) => {
@@ -55,15 +56,27 @@ const getAllPosts = async (req, res) => {
   
   const deletePost = async (req, res) => {
     try {
-      const post = await Post.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
-      if (!post) return res.status(404).json({ message: "Post not found", success: false });
-  
-      res.json({ message: "Post deleted successfully" });
+        const post = await Post.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
+        if (!post) return res.status(404).json({ message: "Post not found", success: false });
+
+        const messagePayload = {
+            postId: post._id,
+            userId: req.user.userId,
+            contentIds: post.mediaIds
+        };
+
+        logger.info('Publishing delete-post message', messagePayload);
+         
+        await  publishToQueue("deletePost", JSON.stringify(messagePayload));
+
+        logger.info('Successfully published delete-post message');
+
+        res.json({ message: "Post deleted successfully" });
     } catch (e) {
-      logger.error("Error deleting post", e);
-      res.status(500).json({ success: false, message: "Error deleting post" });
+        logger.error("Error deleting post", e);
+        res.status(500).json({ success: false, message: "Error deleting post" });
     }
-  };
+};
   
   module.exports = { createPost, getAllPosts, getPost, deletePost };
   

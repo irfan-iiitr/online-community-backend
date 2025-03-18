@@ -40,3 +40,6 @@ app.listen(PORT, () => {
   logger.info(`post service running on port ${PORT}`);
 });
 
+const rabbitMq = require('./utils/rabbit')
+rabbitMq.connect();
+

@@ -30,6 +30,25 @@ app.use(errorHandler);
 
 app.use('/user',proxy(process.env.USER_SERVICE_URL));
 app.use('/post/',validateToken,proxy(process.env.POST_SERVICE_URL));
+app.use('/content/', validateToken, proxy(process.env.CONTENT_SERVICE_URL, {
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        // Forward content-type to ensure multipart is handled correctly
+        proxyReqOpts.headers = {
+            ...proxyReqOpts.headers,
+            'Content-Type': srcReq.headers['content-type'] || 'application/json',
+        };
+        return proxyReqOpts;
+    },
+    proxyReqBodyDecorator: (bodyContent, srcReq) => {
+        // Skip body processing for multipart/form-data
+        if (srcReq.headers['content-type']?.startsWith('multipart/form-data')) {
+            return bodyContent; // Let proxy handle it
+        }
+        return bodyContent;
+    },
+    parseReqBody: false // Important: Prevents express-http-proxy from interfering with file streams
+}));
+
 
 app.listen(PORT, () => {
     logger.info(`API Gateway is running on port ${PORT}`);
