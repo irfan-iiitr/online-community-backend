@@ -49,6 +49,8 @@ app.use('/content/', validateToken, proxy(process.env.CONTENT_SERVICE_URL, {
     parseReqBody: false // Important: Prevents express-http-proxy from interfering with file streams
 }));
 
+app.use('/search/',validateToken,proxy(process.env.SEARCH_SERVICE_URL));
+
 
 app.listen(PORT, () => {
     logger.info(`API Gateway is running on port ${PORT}`);

@@ -14,7 +14,14 @@ const createPost = async (req, res) => {
       const newlyCreatedPost = new Post({ user: req.user.userId, content, mediaIds });
   
       await newlyCreatedPost.save();
+      const newPostStreamData={
+        postId:newlyCreatedPost._id.toString(),
+        userId:newlyCreatedPost.user.toString(),
+        content:newlyCreatedPost.content,
+        createdAt:newlyCreatedPost.createdAt,
+      }
 
+      publishToQueue("new-post",JSON.stringify(newPostStreamData)); 
 
       logger.info("Post created successfully", newlyCreatedPost);
       res.status(201).json({ success: true, message: "Post created successfully" });

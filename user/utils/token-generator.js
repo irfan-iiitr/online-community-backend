@@ -8,7 +8,7 @@ const tokenGenerator=async(user)=>{
    
    const refreshToken=crypto.randomBytes(40).toString('hex');
    const expiresAt= new Date();
-   expiresAt.setDate(expiresAt.getDate()+7) //7 days
+   expiresAt.setDate(expiresAt.getDate()+10) //7 days
    await RefreshToken.create({token:refreshToken,user:user._id,expiresAt});
    console.log("token",token);
    return {token,refreshToken};

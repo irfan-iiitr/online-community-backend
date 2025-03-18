@@ -20,7 +20,7 @@ const connectToMongoDB = require("./db");
 const errorHandler = require("./middleware/error-handler");
 
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 
 connectToMongoDB();
 
