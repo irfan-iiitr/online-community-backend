@@ -1,5 +1,7 @@
 # Online Community Microservice Architecture
 
+[Postman Documentation](https://documenter.getpostman.com/view/31394126/2sAYkDPMcd)
+
 A microservice-based Online Community platform using Node.js, Express, MongoDB, and RabbitMQ.
 
 ## Project Structure
@@ -120,4 +122,4 @@ social-media-microservice/
 5. **Search Service (Port 3004)**
    - Full-text search capabilities
    - Post indexing and search
-   - Event handling for post updates 
+   - Event handling for post updates
